@@ -1,54 +1,69 @@
 # Zezin
 
--  App para GET e POST de PDV's, usando:
-    - python 3.7.3
+-  Aplicação para criação e retorno de parceiros com base em coordenadas geográficas, usando:
+    - Python 3.7.3
     - Flask
     - Postgres
-    - Flask-SQLAlchemy
     - GeoAlchemy2
 
-Antes de começar, é necessário a criação e ativação de uma VirtualEnv com Python 3.7.3, para isso recomendo pyenv.
-Após isso, vá para a pasta raiz desse projeto (zezin) e siga as instruções abaixo.
+Antes de começar, é necessário a criação e ativação de uma virtualenv com Python 3.7.3, para isso recomendo pyenv.
 
-1) Instale os requisitos do projeto
+Siga as instruções abaixo:
+
+
+1) Clone o projeto em sua máquina e vá para a pasta raiz desse projeto (zezin)
+
+    ```shell
+    $ git clone git@github.com:suviolet/zezin.git
+    $ cd zezin/
+    ```
+
+2) Instale os requisitos do projeto
 
     ```shell
     $ make requirements-pip
     ```
 
-2) Suba o docker
+3) Suba a imagem do docker com o Postgres usando extensão Postgis
 
     ```shell
     $ make docker-compose-up
     ```
 
-3) Faça a migração e suba a aplicação
+4) Popule a base com os dados do `pdvs.json`
 
     ```shell
-    $ make runserver-dev
+    $ make populate
+    ```
+
+5) E suba a aplicação
+
+    ```shell
+    $ make runserver
     ```
 
 ***
 
 ## Usando a aplicação com curl:
 
-- Cria um novo parceiro no banco:
+- Para criar um novo parceiro no banco:
 
     ```shell
     $ curl -X POST 'http://127.0.0.1:5000/partners/' -d '{"owner_name": "Ze do churros", "document": "209/30000", "trading_name": "Churreria do ze",  "coverage_area": {"type": "MultiPolygon", "coordinates": [[[[-43.36556, -22.99669], [-43.36539, -23.01928 ], [ -43.26583, -23.01802 ], [ -43.25724, -23.00649 ], [ -43.23355, -23.00127 ], [ -43.2381, -22.99716 ], [ -43.23866, -22.99649 ], [ -43.24063, -22.99756 ], [ -43.24634, -22.99736 ], [ -43.24677, -22.99606 ], [ -43.24067, -22.99381 ], [ -43.24886, -22.99121 ], [ -43.25617, -22.99456 ], [ -43.25625, -22.99203 ], [ -43.25346, -22.99065 ], [ -43.29599, -22.98283 ], [ -43.3262, -22.96481 ], [-43.33427, -22.96402], [-43.33616, -22.96829], [-43.342, -22.98157], [-43.34817, -22.97967], [-43.35142, -22.98062], [-43.3573, -22.98084], [-43.36522, -22.98032], [-43.36696, -22.98422], [-43.36717, -22.98855], [-43.36636, -22.99351], [-43.36556, -22.99669]]]]}, "address": {"type": "Point", "coordinates": [-43.297337, -23.013538]}}' -H 'Content-type: application/json'
     ```
 
+    response:
     ```
     {"address":{"coordinates":[-43.297337,-23.013538],"type":"Point"},"coverage_area":{"coordinates":[[[[-43.36556,-22.99669],[-43.36539,-23.01928],[-43.26583,-23.01802],[-43.25724,-23.00649],[-43.23355,-23.00127],[-43.2381,-22.99716],[-43.23866,-22.99649],[-43.24063,-22.99756],[-43.24634,-22.99736],[-43.24677,-22.99606],[-43.24067,-22.99381],[-43.24886,-22.99121],[-43.25617,-22.99456],[-43.25625,-22.99203],[-43.25346,-22.99065],[-43.29599,-22.98283],[-43.3262,-22.96481],[-43.33427,-22.96402],[-43.33616,-22.96829],[-43.342,-22.98157],[-43.34817,-22.97967],[-43.35142,-22.98062],[-43.3573,-22.98084],[-43.36522,-22.98032],[-43.36696,-22.98422],[-43.36717,-22.98855],[-43.36636,-22.99351],[-43.36556,-22.99669]]]],"type":"MultiPolygon"},"document":"209/30000","owner_name":"Ze do churros","trading_name":"Churreria do Ze"}
     ```
 
-- Retorna um parceiro por id:
+- Para buscar um parceiro por id:
 
     ```shell
-    $ curl -X GET 'http://127.0.0.1:5000/partners/1/' -H 'Content-type: application/json'
     $ curl -X GET 'http://127.0.0.1:5000/partners/1/' -H 'Content-type: application/json' | python -m json.tool # pretty view
     ```
 
+    response:
     ```
     {
         "address": {
@@ -76,67 +91,19 @@ Após isso, vá para a pasta raiz desse projeto (zezin) e siga as instruções a
             ],
             "type": "MultiPolygon"
         },
-        "document": "209/30000",
-        "owner_name": "Ze do churros",
-        "trading_name": "Churreria do Ze"
+        "document": "02.453.716/000170",
+        "owner_name": "Ze da Ambev",
+        "trading_name": "Adega Osasco"
     }
     ```
 
-- Procura por parceiro mais próximo dentro da area de cobertura:
+- Para buscar um parceiro mais próximo e que esteja dentro da area de cobertura, passando os parâmetros longitude `lng` e latitude `lat`:
 
     ```shell
-    $ curl -X GET 'http://127.0.0.1:5000/partners/?lat=-23.0104&lng=-43.3562'
-    $ curl -X GET 'http://127.0.0.1:5000/partners/?lat=-23.0104&lng=-43.3562' | python -m json.tool # pretty view
-    ```
-
-    ```
-    {
-        "address": {
-            "coordinates": [
-                -43.297337,
-                -23.013538
-            ],
-            "type": "Point"
-        },
-        "coverage_area": {
-            "coordinates": [
-                [
-                    [
-                        [
-                            -43.36556,
-                            -22.99669
-                        ],
-                        ...
-                        [
-                            -43.36556,
-                            -22.99669
-                        ]
-                    ]
-                ]
-            ],
-            "type": "MultiPolygon"
-        },
-        "document": "209/30000",
-        "owner_name": "Ze do churros",
-        "trading_name": "Churreria do ze"
-    }
-    ```
-
-***
-- Caso queira testar com os dados do arquivo `pdvs.json` rodar os seguintes comandos:
-
-    ```
-    $ make populate
-    $ make runserver
-    ```
-
-- Procura por parceiro mais próximo dentro da area de cobertura utilizando os dados da base populada:
-
-    ```shell
-    $ curl -X GET 'http://127.0.0.1:5000/partners/?lat=-23.61440&lng=-46.62135'
     $ curl -X GET 'http://127.0.0.1:5000/partners/?lat=-23.61440&lng=-46.62135' | python -m json.tool # pretty view
     ```
 
+    response:
     ```
     {
         "address": {
@@ -172,15 +139,21 @@ Após isso, vá para a pasta raiz desse projeto (zezin) e siga as instruções a
 
 ***
 
-## Para testar a aplicação:
-- Rodar testes unitários:
+## Para rodar os testes unitários da aplicação e sua cobertura:
+- Testes unitários:
 
     ```shell
     $ make test
     ```
 
-- Rodar cobertura dos testes:
+- Cobertura dos testes:
 
     ```shell
     $ make coverage
+    ```
+
+## Outros comandos consulte o `make`
+
+    ```shell
+    $ make help
     ```
