@@ -28,6 +28,15 @@ migrate:  ## Create migrations
 upgrade: ## Execute the migrations
 	python -m zezin.manage db upgrade
 
+test: clean ## Run the test suite
+	py.test  $(PROJECT_NAME)/ -s -vvv
+
+test-matching: clean  ## Run only tests matching pattern. E.g.: make test-matching test=TestClassName
+	py.test $(PROJECT_NAME)/ -k $(test) -s -vvv
+
+coverage: clean  ## Run the test coverage report
+	py.test --cov $(PROJECT_NAME) --cov-report term-missing
+
 lint: clean  ## Run pylint linter
 	@printf '\n --- \n >>> Running linter...<<<\n'
 	@pylint $(PROJECT_NAME)/*
@@ -43,7 +52,7 @@ style-check:  ## Check isort and black code style
 populate: clean  ## Populate the database with partners and coordinates
 	@python -m $(PROJECT_NAME).populate
 
-runserver-dev: clean migrate  ## Run dev (flask) web server
+runserver-dev: clean upgrade  ## Run dev (flask) web server
 	export FLASK_APP=$(PROJECT_NAME).app.py && flask run
 
 docker-compose-up: clean ## Up docker-compose for development

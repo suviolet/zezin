@@ -12,6 +12,10 @@ def create_app(settings_override={}):
 
     db.init_app(app)
 
+    from zezin.views import partners_routes
+
+    app.register_blueprint(blueprint=partners_routes)
+
     return app
 
 
