@@ -40,6 +40,9 @@ style:  ## Run isort and black auto formatting code style in the project
 style-check:  ## Check isort and black code style
 	@black -S -t py37 -l 79 --check $(PROJECT_NAME)/. --exclude '/(\.git|\.venv|env|venv|build|dist)/'
 
+populate: clean  ## Populate the database with partners and coordinates
+	@python -m $(PROJECT_NAME).populate
+
 runserver-dev: clean migrate  ## Run dev (flask) web server
 	export FLASK_APP=$(PROJECT_NAME).app.py && flask run
 
