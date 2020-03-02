@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-# pylint: disable=dangerous-default-value,wrong-import-position,unused-import
+# pylint: disable=dangerous-default-value,wrong-import-position,unused-import, import-outside-toplevel
 def create_app(settings_override={}):
     app = Flask(__name__)
     app.config.from_object('zezin.settings.Configuration')
