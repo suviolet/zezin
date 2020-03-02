@@ -75,3 +75,26 @@ def test_create_partner_failed_already_exists_document(
     assert response.status_code == 409
     assert response.headers['Content-Type'] == 'application/json'
     assert response.json['message'] == message
+
+
+@pytest.mark.usefixtures('session')
+def test_retrieve_partner_with_success(
+    client, headers, payload, partner_saved
+):
+    # pylint: disable=protected-access
+    response = client.get(f'partners/{partner_saved._id}/', headers=headers)
+
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response.json == payload
+
+
+@pytest.mark.usefixtures('session')
+def test_retrieve_partner_failed_not_found_partner(client, headers):
+    partner_id = 666
+    message = f'Partner: {partner_id} could not be found.'
+    response = client.get(f'partners/{partner_id}/', headers=headers)
+
+    assert response.status_code == 404
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response.json['message'] == message
