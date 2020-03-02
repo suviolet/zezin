@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgresql:
+    image: kartoza/postgis:12.0
+    container_name: postgres-ze
+    network_mode: bridge
+    ports:
+      - 5432:5432/tcp
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASS=postgres
+      - POSTGRES_DB=ze
