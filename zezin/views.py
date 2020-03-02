@@ -1,5 +1,6 @@
 from flask import Blueprint, make_response, request
 from marshmallow.exceptions import ValidationError
+from sqlalchemy import func
 from sqlalchemy.exc import DataError, IntegrityError
 from werkzeug.exceptions import NotFound
 
@@ -43,3 +44,35 @@ def retrieve_partner(partner_id):
         return make_response(message, 404, HEADERS)
 
     return make_response(schema.dump(partner.__dict__), 200, HEADERS)
+
+
+@partners_routes.route('partners/', methods=['GET'])
+def search_nearest_partner():
+    try:
+        longitude = float(request.args.get('lng'))
+        latitude = float(request.args.get('lat'))
+    except ValueError:
+        message = {
+            'message': f'Bad request: lng and lat are '
+            'required and should be float type'
+        }
+        return make_response(message, 400, HEADERS)
+    else:
+        partner = (
+            Partner.query.filter(
+                func.ST_Intersects(
+                    Partner.coverage_area, f'POINT({longitude} {latitude})'
+                )
+            )
+            .order_by(
+                func.ST_Distance(
+                    Partner.address, f'POINT({longitude} {latitude})'
+                )
+            )
+            .first()
+        )
+
+        if partner:
+            return make_response(schema.dump(partner), 200, HEADERS)
+
+        return make_response('', 204, HEADERS)
