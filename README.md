@@ -153,11 +153,11 @@ Siga as instruções abaixo:
 
 ***
 
-## Outros comandos consulte o `make`
+## Outros comandos consulte o `make`:
 
-    ```shell
-    $ make help
-    ```
+```shell
+$ make help
+```
 
 ***
 
