@@ -71,4 +71,5 @@ docker-build-image:  ## Create image to zezin project
 	@docker build -t "zezin:1.0" --pull --no-cache --build-arg UID=$(UID) --build-arg GID=$(GID) --build-arg COMMAND=runserver  -f Dockerfile .
 
 docker-run-server: docker-compose-up  ## Up application on container
+	@docker rm -f zezinho
 	@docker run --name zezinho --env-file .env -d -p 5000:5000 zezin:1.0 --network bridge

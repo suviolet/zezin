@@ -1,6 +1,6 @@
 # Zezin
 
--  Aplicação para criação e retorno de parceiros com base em coordenadas geográficas, usando:
+-  Aplicação para criação e retorno de parceiros com base em coordenadas geográficas usando:
     - Python 3.7.3
     - Flask
     - Postgres
@@ -9,7 +9,6 @@
 Antes de começar, é necessário a criação e ativação de uma virtualenv com Python 3.7.3, para isso recomendo pyenv.
 
 Siga as instruções abaixo:
-
 
 1) Clone o projeto em sua máquina e vá para a pasta raiz desse projeto (zezin)
 
@@ -152,8 +151,14 @@ Siga as instruções abaixo:
     $ make coverage
     ```
 
+***
+
 ## Outros comandos consulte o `make`
 
     ```shell
     $ make help
     ```
+
+***
+
+Para realizar deploy da aplicação, basta usar o `Dockerfile` na raiz do projeto, considerando o `.env` que possui as variáveis de acesso ao banco.
